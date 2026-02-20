@@ -32,7 +32,9 @@ app.post('/v1/messages', async (req: Request, res: Response) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': process.env.ANTHROPIC_API_KEY || 'fake-key',
-        'anthropic-version': req.headers['anthropic-version'] || '2023-06-01'
+        'anthropic-version': req.headers['anthropic-version'] || '2023-06-01',
+        ...(req.headers['anthropic-beta'] ? { 'anthropic-beta': req.headers['anthropic-beta'] } : {}),
+        ...(req.headers['anthropic-dangerous-direct-browser-access'] ? { 'anthropic-dangerous-direct-browser-access': req.headers['anthropic-dangerous-direct-browser-access'] } : {}),
       }
     });
     

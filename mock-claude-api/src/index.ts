@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import swaggerUi from 'swagger-ui-express';
+import * as fs from 'fs';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -11,6 +13,10 @@ const modelUsed = process.env.MODEL_USED || 'unknown-model';
 
 app.use(cors());
 app.use(express.json());
+
+// Load Swagger document
+const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, '../swagger.json'), 'utf8'));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.post('/v1/messages', (req: Request, res: Response) => {
   console.log(`[Mock API] Received request for model: ${req.body.model}`);
