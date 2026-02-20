@@ -1,0 +1,43 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Claude Proxy API",
+    "version": "1.0.0",
+    "description": "A simple proxy for Anthropic API requests with stats tracking."
+  },
+  "paths": {
+    "/v1/messages": {
+      "post": {
+        "summary": "Forward Claude messages",
+        "description": "Forwards the request to the configured Anthropic-compatible API.",
+        "responses": {
+          "200": {
+            "description": "Successful response from the upstream API"
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "summary": "Get proxy stats",
+        "description": "Returns the number of requests processed and the model used.",
+        "responses": {
+          "200": {
+            "description": "Stats object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requestCount": { "type": "integer" },
+                    "modelUsed": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
