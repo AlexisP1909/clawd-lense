@@ -5,10 +5,15 @@ import './App.css'
 interface Stats {
   requestCount: number
   modelUsed: string
+  lastResponse?: string
 }
 
 function App() {
-  const [stats, setStats] = useState<Stats>({ requestCount: 0, modelUsed: 'Loading...' })
+  const [stats, setStats] = useState<Stats>({ 
+    requestCount: 0, 
+    modelUsed: 'Loading...',
+    lastResponse: 'Awaiting first request...'
+  })
   const [loading, setLoading] = useState(true)
 
   const fetchStats = async () => {
@@ -51,7 +56,17 @@ function App() {
             <Cpu className="icon text-purple" />
             <h2>Model Used</h2>
           </div>
-          <div className="card-value small">{stats.modelUsed}</div>
+          <div className="card-value small">{stats.modelUsed || 'N/A'}</div>
+        </div>
+      </div>
+
+      <div className="card response-card">
+        <div className="card-header">
+          <Activity className="icon text-green" />
+          <h2>Last AI Response</h2>
+        </div>
+        <div className="card-value response-text">
+          {stats.lastResponse}
         </div>
       </div>
 

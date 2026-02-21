@@ -32,14 +32,14 @@ Open three separate terminals and start the services:
 
 ## 2. Dynamic Testing (Recommended)
 
-We've included a simulation script that sends a "Claude Code" style request (with tools, system prompts, and beta headers) to the proxy.
+We've included a simulation script that sends a "Claude Code" style request. You can now use the `-m` flag to send custom prompts:
 
 ```bash
 cd mock-claude-api
-npm run simulate
+npm run simulate -- -m "Hello, please tell me a joke about robots."
 ```
 
-Check the output in this terminal and the logs in the Proxy/Mock API terminals.
+Check the output in this terminal and verify the response on the **Dashboard**.
 
 ## 3. Manual Testing (curl)
 
@@ -61,7 +61,7 @@ curl http://localhost:3000/v1/messages \
 ## 4. Verification
 
 1. **Logs**: View the Proxy terminal to see the request being forwarded.
-2. **Dashboard**: Open `http://localhost:5173`. You should see the **Total Requests** count increment.
+2. **Dashboard**: Open `http://localhost:5173`. You should see the **Total Requests** count increment and the **Last AI Response** updated.
 3. **Swagger**:
    - Proxy Documentation: `http://localhost:3000/docs`
    - Mock API Documentation: `http://localhost:3001/docs`

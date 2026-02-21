@@ -6,8 +6,15 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const proxyUrl = 'http://localhost:3000/v1/messages';
 
+// Simple argument parsing for -m flag
+const args = process.argv.slice(2);
+const messageIdx = args.indexOf('-m') !== -1 ? args.indexOf('-m') : args.indexOf('--message');
+const userPrompt = messageIdx !== -1 && args[messageIdx + 1] 
+  ? args[messageIdx + 1] 
+  : 'I need to list the files in this directory.';
+
 async function simulateClaudeCodeRequest() {
-  console.log('--- Simulating Claude Code CLI Request ---');
+  console.log(`--- Simulating Claude Code CLI Request: "${userPrompt}" ---`);
   try {
     const payload = {
       model: process.env.MODEL_USED || 'claude-3-5-sonnet-20241022',
@@ -15,7 +22,7 @@ async function simulateClaudeCodeRequest() {
       messages: [
         {
           role: 'user',
-          content: 'I need to list the files in this directory.'
+          content: userPrompt
         }
       ],
       system: 'You are Claude Code, a helpful CLI assistant.',

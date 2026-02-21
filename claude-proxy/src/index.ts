@@ -11,9 +11,10 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 const app = express();
 const port = 3000;
 const targetUrl = process.env.ANTHROPIC_BASE_URL || 'http://localhost:3001';
-const modelUsed = process.env.MODEL_USED || 'ministral-3:3b';
+const modelUsed = process.env.MODEL_USED;
 
 let requestCount = 0;
+let lastResponse = "No requests yet";
 
 app.use(cors());
 app.use(express.json());
@@ -45,6 +46,13 @@ app.post('/v1/messages', async (req: Request, res: Response) => {
     const response = await axios.post(upstreamUrl, req.body, {
       headers: forwardHeaders
     });
+
+    // Capture the last response content for the dashboard
+    if (response.data?.content?.[0]?.text) {
+      lastResponse = response.data.content[0].text;
+    } else if (response.data?.content?.[0]?.type === 'tool_use') {
+      lastResponse = `[Tool Use] ${response.data.content[0].name}`;
+    }
     
     res.status(response.status).json(response.data);
   } catch (error: any) {
@@ -61,7 +69,8 @@ app.post('/v1/messages', async (req: Request, res: Response) => {
 app.get('/stats', (req: Request, res: Response) => {
   res.json({
     requestCount,
-    modelUsed
+    modelUsed,
+    lastResponse
   });
 });
 
