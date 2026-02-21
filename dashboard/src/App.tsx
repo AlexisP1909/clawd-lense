@@ -15,6 +15,7 @@ function App() {
     lastResponse: 'Awaiting first request...'
   })
   const [loading, setLoading] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState<string>(new Date().toLocaleTimeString())
 
   const fetchStats = async () => {
     setLoading(true)
@@ -22,6 +23,7 @@ function App() {
       const response = await fetch('/api/stats')
       const data = await response.json()
       setStats(data)
+      setLastUpdated(new Date().toLocaleTimeString())
     } catch (error) {
       console.error('Error fetching stats:', error)
     } finally {
@@ -78,7 +80,7 @@ function App() {
       </div>
 
       <footer>
-        <p>Updates every 5 seconds • Connected to http://localhost:3000</p>
+        <p>Last updated: {lastUpdated} • Updates every 5 seconds • Connected to http://localhost:3000</p>
       </footer>
     </div>
   )

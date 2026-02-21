@@ -11,10 +11,32 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 const app = express();
 const port = 3000;
 const targetUrl = process.env.ANTHROPIC_BASE_URL || 'http://localhost:3001';
-const modelUsed = process.env.MODEL_USED;
-
 let requestCount = 0;
 let lastResponse = "No requests yet";
+let modelUsed = "No requests yet";
+
+const statsFilePath = path.join(__dirname, '../stats.json');
+
+// Load initial state from file if it exists
+if (fs.existsSync(statsFilePath)) {
+  try {
+    const savedStats = JSON.parse(fs.readFileSync(statsFilePath, 'utf8'));
+    requestCount = savedStats.requestCount || 0;
+    lastResponse = savedStats.lastResponse || "No requests yet";
+    modelUsed = savedStats.modelUsed || "No requests yet";
+    console.log(`[Proxy] Loaded stats: ${requestCount} requests.`);
+  } catch (e) {
+    console.error('[Proxy] Failed to load stats.json, starting fresh.');
+  }
+}
+
+const saveStats = () => {
+  try {
+    fs.writeFileSync(statsFilePath, JSON.stringify({ requestCount, modelUsed, lastResponse }, null, 2));
+  } catch (e) {
+    console.error('[Proxy] Failed to save stats.json');
+  }
+};
 
 app.use(cors());
 app.use(express.json());
@@ -54,9 +76,14 @@ app.post('/v1/messages', async (req: Request, res: Response) => {
       lastResponse = `[Tool Use] ${response.data.content[0].name}`;
     }
     
+    if (response.data?.model) {
+      modelUsed = response.data.model;
+    }
+    saveStats();
     res.status(response.status).json(response.data);
   } catch (error: any) {
     console.error(`[Proxy] Error forwarding request: ${error.message}`);
+    saveStats(); // Save incremented count even on error
     if (error.response) {
       res.status(error.response.status).json(error.response.data);
     } else {
