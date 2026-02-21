@@ -3,13 +3,29 @@
   "info": {
     "title": "Claude Proxy API",
     "version": "1.0.0",
-    "description": "A simple proxy for Anthropic API requests with stats tracking."
+    "description": "A simple proxy for Anthropic API requests, forwarding to Ollama with stats tracking and header propagation (e.g., anthropic-beta)."
   },
   "paths": {
     "/v1/messages": {
       "post": {
         "summary": "Forward Claude messages",
-        "description": "Forwards the request to the configured Anthropic-compatible API.",
+        "description": "Forwards the request to the configured Ollama API, propagating standard Anthropic headers.",
+        "parameters": [
+          {
+            "name": "anthropic-beta",
+            "in": "header",
+            "description": "Beta features to enable",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "anthropic-version",
+            "in": "header",
+            "description": "API version",
+            "required": false,
+            "schema": { "type": "string", "default": "2023-06-01" }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response from the upstream API"

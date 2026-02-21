@@ -11,7 +11,7 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 const app = express();
 const port = 3000;
 const targetUrl = process.env.ANTHROPIC_BASE_URL || 'http://localhost:3001';
-const modelUsed = process.env.MODEL_USED || 'devstral-2';
+const modelUsed = process.env.MODEL_USED || 'ministral-3:3b';
 
 let requestCount = 0;
 
@@ -27,15 +27,23 @@ app.post('/v1/messages', async (req: Request, res: Response) => {
   requestCount++;
   console.log(`[Proxy] Forwarding request #${requestCount} to ${targetUrl}`);
   
+  // Extract and forward all relevant headers
+  const forwardHeaders: any = {
+    'Content-Type': 'application/json',
+  };
+
+  Object.keys(req.headers).forEach(key => {
+    const lowercaseKey = key.toLowerCase();
+    if (lowercaseKey.startsWith('anthropic-') || lowercaseKey === 'x-api-key') {
+      forwardHeaders[key] = req.headers[key];
+    }
+  });
+
   try {
-    const response = await axios.post(`${targetUrl}/v1/messages`, req.body, {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || 'fake-key',
-        'anthropic-version': req.headers['anthropic-version'] || '2023-06-01',
-        ...(req.headers['anthropic-beta'] ? { 'anthropic-beta': req.headers['anthropic-beta'] } : {}),
-        ...(req.headers['anthropic-dangerous-direct-browser-access'] ? { 'anthropic-dangerous-direct-browser-access': req.headers['anthropic-dangerous-direct-browser-access'] } : {}),
-      }
+    // Forward the request to the target URL, maintaining the path
+    const upstreamUrl = `${targetUrl}/v1/messages`;
+    const response = await axios.post(upstreamUrl, req.body, {
+      headers: forwardHeaders
     });
     
     res.status(response.status).json(response.data);

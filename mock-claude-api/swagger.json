@@ -3,13 +3,13 @@
   "info": {
     "title": "Mock Claude API",
     "version": "1.0.0",
-    "description": "A mock server emulating Anthropic's Claude API for testing."
+    "description": "A mock server emulating Anthropic's Claude API for testing, updated for Claude Code compatibility."
   },
   "paths": {
     "/v1/messages": {
       "post": {
-        "summary": "Create a message (Mock)",
-        "description": "Returns a mock Anthropic-compliant message response.",
+        "summary": "Create a message (Mock Claude Code)",
+        "description": "Returns a mock Anthropic-compliant message response, supporting system prompts, tools, and betas.",
         "requestBody": {
           "required": true,
           "content": {
@@ -27,7 +27,24 @@
                         "content": { "type": "string" }
                       }
                     }
-                  }
+                  },
+                  "system": { "type": "string" },
+                  "tools": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "description": { "type": "string" },
+                        "input_schema": { "type": "object" }
+                      }
+                    }
+                  },
+                  "betas": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "max_tokens": { "type": "integer" }
                 }
               }
             }

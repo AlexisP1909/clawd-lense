@@ -19,9 +19,14 @@ const swaggerDocument = JSON.parse(fs.readFileSync(path.join(__dirname, '../swag
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.post('/v1/messages', (req: Request, res: Response) => {
-  console.log(`[Mock API] Received request for model: ${req.body.model}`);
-  
+  const { model, messages, system, tools, betas } = req.body;
+  console.log(`[Mock API] Received request for model: ${model}`);
+  if (system) console.log(`[Mock API] System Prompt: ${system.substring(0, 50)}...`);
+  if (tools) console.log(`[Mock API] Tools Provided: ${tools.map((t: any) => t.name).join(', ')}`);
+  if (betas) console.log(`[Mock API] Betas Enabled: ${betas.join(', ')}`);
+
   // Basic Anthropic-compliant response
+  // If tools are provided, maybe simulate a tool use?
   const response = {
     id: `msg_${Math.random().toString(36).substring(7)}`,
     type: 'message',
@@ -30,14 +35,14 @@ app.post('/v1/messages', (req: Request, res: Response) => {
     content: [
       {
         type: 'text',
-        text: `Hello! I am a mock Claude emulating ${modelUsed}. You sent: "${req.body.messages?.[req.body.messages.length - 1]?.content || 'nothing'}"`
+        text: `Hello! I am a mock Claude emulating ${modelUsed}. I see you are using ${tools ? tools.length : 0} tools and ${betas ? betas.length : 0} betas. Your last message was: "${messages?.[messages.length - 1]?.content || 'nothing'}"`
       }
     ],
     stop_reason: 'end_turn',
     stop_sequence: null,
     usage: {
-      input_tokens: 10,
-      output_tokens: 20
+      input_tokens: 15,
+      output_tokens: 25
     }
   };
 
