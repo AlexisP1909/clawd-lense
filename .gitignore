@@ -28,3 +28,6 @@ pnpm-debug.log*
 .cache/
 temp/
 tmp/
+
+**/stats.json
+claude-proxy/stats.json
